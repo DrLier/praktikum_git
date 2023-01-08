@@ -1,15 +1,37 @@
-# **PENTING UNTUK DIBACA**
-1. Pastikan UML *Ardx* ,*Aldx* Memory yang sebelumnya **128 diganti 256** pada file topologi.sh. Sedangkan untuk UML *Walx dan Monx* diganti menjadi *128 dari yang awalnya 64*
+# **ROUTING**
 
-2. Jalankan **iptables** agar client *Walx* dan *Monx* bisa terhubung ke internet.
-```shell
-iptables-legacy -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s NID_DMZ
-iptables-legacy -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 192.168.0.0/16
-```
+Berikut sub-bab yang akan kita pelajari pada materi routing :
+1. [Pengertian](#pengertian)
+2. [Istilah](#istilah)
+3. [Praktik](#praktik)
 
-# 1. DNS (Domain Name System)
+## Pengertian
 
-## 1.1 Teori
+Routing adalah proses meneruskan paket-paket data dari satu jaringan ke jaringan yang lainnya. Proses ini dapat diartikan juga sebagai penggabungan beberapa jaringan untuk meneruskan paket data dari satu jaringan ke jaringan selanjutnya.
+
+Routing yang akan dipelajari pada praktikum saat ini yaitu Static Routing (Perutean Statis), yang mengharuskan administrator jaringan untuk menambahkan/memberitahukan rute (route) baru ke dalam tabel routing ketika terdapat subnet tambahan dalam jaringannya.
+
+Konsep static routing sederhana, daftarkan NID dan netmask yang ada serta tentukan gateway untuk menuju ke subnet tersebut. Untuk mencoba teknik routing static, kita akan menggunakan aplikasi Cisco Packet Tracer.
+
+## Istilah
+
+Istilah | Penjelasan
+--------|-----------
+ip route | Perintah untuk membuat static routing itu sendiri.
+destination | Network yang hendak ditambahkan ke routing table
+next_hop_address | Address dari hop router selanjutnya, yakni yang akan menerima paket dan mem-forward-nya lagi ke network remote.
+iface | Disebut network interface, antarmuka yang menghubungkan 2 layer protokol. Setiap interface memiliki nama yang berbeda
+eth0 | Salah satu nama interface yang digunakan untuk berhubungan dengan subnet
+address | Sebuah alamat IP unik bagi komputer dalam sebuah jaringan
+netmask | Kombinasi angka sepanjang 32 bit yang berfungsi membagi IP ke dalam subnet-subnet dan menentukan rentang alamat IP pada subnet yang bisa digunakan
+gateway | Alamat IP yang menjadi pintu keluar menuju subnet lain, biasanya diisi alamat IP router terdekat
+
+## Praktik
+
+Buka software `cisco packet tracer` yang telah diinstal pada [install](./frmn.php).
+
+2. 
+
 
 ### 1.1.A Pengertian
 
