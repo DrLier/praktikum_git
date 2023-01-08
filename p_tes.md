@@ -9,6 +9,16 @@ Berikut sub-bab yang akan kita pelajari pada materi routing :
 
 Routing adalah proses meneruskan paket-paket data dari satu jaringan ke jaringan yang lainnya. Proses ini dapat diartikan juga sebagai penggabungan beberapa jaringan untuk meneruskan paket data dari satu jaringan ke jaringan selanjutnya.
 
+Routing terbagi atas 2 cara, yaitu : 
+ - **Routing Statis**
+ - **Routing Dinamis**
+
+**Routing statis** adalah proses mengkonfigurasi router jaringan menggunakan tabel routing yang dikonfigurasi secara manual oleh administrator jaringan.
+
+**Routing Dinamis** adalah proses mengkonfigurasi router yang secara otomatis dapat menghasilkan tabel routing berdasarkan lalu lintas jaringan dan router yang terhubung.
+
+Tidak seperti routing statis, routing dinamis memiliki protokol perutean yang secara otomatis mengatur router untuk berkomunikasi satu sama lain dengan memberikan informasi tentang jaringan dan koneksi antar router.
+
 Routing yang akan dipelajari pada praktikum saat ini yaitu Static Routing (Perutean Statis), yang mengharuskan administrator jaringan untuk menambahkan/memberitahukan rute (route) baru ke dalam tabel routing ketika terdapat subnet tambahan dalam jaringannya.
 
 Konsep static routing sederhana, daftarkan NID dan netmask yang ada serta tentukan gateway untuk menuju ke subnet tersebut. Untuk mencoba teknik routing static, kita akan menggunakan aplikasi Cisco Packet Tracer.
@@ -30,305 +40,130 @@ gateway | Alamat IP yang menjadi pintu keluar menuju subnet lain, biasanya diisi
 
 Buka software `cisco packet tracer` yang telah diinstal pada [install](./frmn.php).
 
-2. 
+### 1). Membuat topologi
+<img src="https://i.ibb.co/qB3ZKv3/image.png" alt="1" border="0" />
 
+Untuk menambahkan Router, Switch, dan PC dapat dilakukan dengan *drag and drop* yang ada pada menu. Pada praktik kali ini, sesuaikan *device* dengan pilihan dengan kotak merah pada gambar di bawah 
 
-### 1.1.A Pengertian
+* untuk menambahkan Cloud
+<img src="https://i.ibb.co/VLxcnNf/image.png" alt="1" border="0" />
 
-DNS (_Domain Name System_) adalah sistem penamaan untuk semua device (smartphone, computer, atau
-network) yang terhubung dengan internet. DNS Server berfungsi menerjemahkan nama domain menjadi alamat IP. DNS dibuat guna untuk menggantikan sistem penggunaan file host yang dirasa tidak efisien.
+* untuk menambahkan Router
+<img src="https://i.ibb.co/Q8X3Q2R/image.png" alt="1" border="0" />
 
-### 1.1.B Cara Kerja
+* untuk menambahkan Switch
+<img src="https://i.ibb.co/NT3mpWL/image.png" alt="1" border="0" />
 
-<img src="https://i.ibb.co/L8DBRpJ/1.jpg" alt="1" border="0" />
+* untuk menambahkan PC
+<img src="https://i.ibb.co/JQWjqm7/image.png" alt="1" border="0" />
 
-Client akan meminta alamt IP dari suatu domain ke DNS server. Jika pada DNS server data alamat IP dari DNS server tersebut ada maka akan di return alamat IP nya kembali menuju client. Jika DNS server tersebut tidak memiliki alamat IP dari domain tersebut maka dia akan bertanya kepada DNS server yang lain sampai alamat domain itu ditemukan.
+* untuk menambahkan Kabel
+<img src="https://i.ibb.co/F0M3LnK/image.png" alt="1" border="0" />
 
-### 1.1.C Aplikasi DNS Server
+* jika terdapat peringatan (*alert*) seperti dibawah ini ketika menyambungkan kabel antar device
+<img src="https://i.ibb.co/NFMwL7q/image.png" alt="1" border="0" />
 
-Untuk praktikum jarkom kita menggunakan aplikasi BIND9 sebagai DNS server, karena BIND(Berkley Internet Naming Daemon) adalah DNS server yang paling banyak digunakan dan juga memiliki fitur-fitur yang cukup lengkap.
+* Maka tambahkan port pada router terlebih dahulu.
+<img src="https://i.ibb.co/VpmRp8N/image.png" alt="1" border="0" />
 
-### 1.1.D List DNS Record
-| Tipe          | Deskripsi                     |
-| ------------- |:-----------------------------|
-| A             | Memetakan nama domain ke alamat IP (IPv4) dari komputer hosting domain|
-| AAAA          | AAAA record hampir mirip A record, tapi mengarahkan domain ke alamat Ipv6|
-| CNAME         | Alias ​​dari satu nama ke nama lain: pencarian DNS akan dilanjutkan dengan mencoba lagi pencarian dengan nama baru|
-| NS            | Delegasikan zona DNS untuk menggunakan authoritative name servers yang diberikan|
-| PTR           | Digunakan untuk Reverse DNS (Domain Name System) lookup|
-| SOA           | Mengacu server DNS yang mengediakan otorisasi informasi tentang sebuah domain Internet|
-| TXT           | Mengijinkan administrator untuk memasukan data acak ke dalam catatan DNS, catatan ini juga digunakan di spesifikasi Sender Policy Framework|
+### 2). Subnetting
 
-### 1.1.E SOA (Start of Authority)
+Praktik kali ini akan menerapkan cara routing untuk teknik *subnetting* **VLSM** yang telah kita lakukan sebelumnya.
+<img src="https://i.ibb.co/3FgydKD/image.png" alt="1" border="0" />
+<img src="https://i.ibb.co/Gk8BNT9/image.png" alt="1" border="0" />
 
-Adalah informasi yang dimiliki oleh suatu DNS zone.
+Atur IP untuk masing-masing **interface** yang ada di setiap *device* sesuai dengan pembagian subnet pada pohon **VLSM**.
 
-| Nama          | Deskripsi                     |
-| ------------- |:-----------------------------|
-| Serial        | Jumlah revisi dari file zona ini. Kenaikan nomor ini setiap kali file zone diubah sehingga perubahannya akan didistribusikan ke server DNS sekunder manapun|
-| Refresh       | Jumlah waktu dalam detik bahwa nameserver sekunder harus menunggu untuk memeriksa salinan baru dari zona DNS dari nameserver utama domain. Jika file zona telah berubah maka server DNS sekunder akan memperbarui salinan zona tersebut agar sesuai dengan zona server DNS utama|
-| Retry         | Jumlah waktu dalam hitungan detik bahwa nameserver utama domain (atau server) harus menunggu jika upaya refresh oleh nameserver sekunder gagal sebelum mencoba refresh zona domain dengan nameserver sekunder itu lagi|
-| Expire        | Jumlah waktu dalam hitungan detik bahwa nameserver sekunder (atau server) akan menahan zona sebelum tidak lagi mempunyai otoritas|
-| Minimum       | Jumlah waktu dalam hitungan detik bahwa catatan sumber daya domain valid. Ini juga dikenal sebagai TTL minimum, dan dapat diganti oleh TTL catatan sumber daya individu|
-| TTL           | (waktu untuk tinggal) - Jumlah detik nama domain di-cache secara lokal sebelum kadaluarsa dan kembali ke nameserver otoritatif untuk informasi terbaru|
+Pada UML, buka /etc/network/interfaces untuk mengatur interface pada setiap perangkat.
 
+Pada Cisco Packet Tracer, interface dapat diatur pada menu **Config** > **INTERFACE** > **“nama interface”** (contoh: FastEthernet0/0). Isi alamat IP dan subnet mask dari subnet interface tersebut. Berikut contoh untuk mengatur IP pada subnet **A4**.
 
+Atur IP pada interface LAB-PUSAT yang mengarah ke LABKOM-1 dengan **192.168.1.5**.
+<img src="https://i.ibb.co/WvWn5zz/image.png" alt="1" border="0" />
 
-------
+Atur IP pada interface LABKOM-1 yang mengarah ke LAB-PUSAT dengan **192.168.1.6**.
+<img src="https://i.ibb.co/T4Lrp6w/image.png" alt="1" border="0" />
 
+Selanjutnya atur IP pada subnet A3.
+Atur IP pada interface LABKOM-1 yang mengarah ke *client* dengan **192.168.1.65**.
+<img src="https://i.ibb.co/BB7SDPj/image.png" alt="1" border="0" />
 
+Atur IP pada *client* LABKOM-1 dengan cara :
+- Masuk ke *client*
+- Pilih tab Desktop
+- Pilih IP Configuration
 
+<img src="https://i.ibb.co/z5WZpKN/image.png" alt="1" border="0" />
 
+<img src="https://i.ibb.co/f9k09d4/image.png" alt="1" border="0" />
 
-## 1.2 Praktik
+Lakukan hal yang sama untuk mengatur alamat IP setiap ***interface*** pada device yang ada dalam topologi. Setelah selesai, lakukan langkah selanjutnya yaitu ***Routing*** agar topologi dapat berfungsi dengan semestinya.
 
-### 1.2.A Buat Topologi Berikut
+### 3). Routing
 
-<img src="https://i.ibb.co/0VsQ35c/Screenshot-15.png" alt="Screenshot-15" border="0">
+Pada Cisco Packet Tracer, ***Routing*** dapat dilakukan pada menu **Config** > **Routing** > **Static** pada device **Router**. Lalu isi **Static Routes** seperti gambar dibawah pada LAB-PUSAT dan tekan tombol **Add**
 
-Referensi 
+![image](https://user-images.githubusercontent.com/31590281/211186519-b7d79c28-8551-4ad7-87b6-4272dc253b6d.png)
 
-[Modul Pengenalan UML](https://github.com/rohanaq/Modul-Pengenalan-UML "Modul Pengenalan UML")
+Pada *static routing* juga dibutuhkan ***default routing*** agar router dapat mengirimkan paket sesuai dengan tujuan. Default routing dibutuhkan untuk router yang berada di bawah router utama (router yang terhubung internet), contohnya LABKOM-1
 
-### 1.2.A Instalasi bind
+![image](https://user-images.githubusercontent.com/31590281/211186553-ba757f74-f86e-4154-a510-09b29798a842.png)
 
-- Buka *Ardx* dan update package lists dengan menjalankan command:
+***Keterangan*** : 
+1. Network 192.168.1.64 adalah Network ID yang akan dihubungkan
+2. Mask 255.255.255.192 adalah netmask dari subnet A3
+3. Next Hop 192.168.1.65 (disebut **gateway**), adalah IP yang dituju ketika ingin menuju subnet poin 1, yaitu interface pada LABKOM-1 yang mengarah ke LAB-PUSAT
 
-	```
-	apt-get update
-	```
+Pada **UML**, *routing* dilakukan pada device ***router*** dengan perintah :
 
-  <img src="https://i.ibb.co/L5hPFbQ/1.png" alt="1" border="0">
+    route add -net <NID subnet> netmask <netmask> gw <IP gateway>
 
-- Setalah melakukan update silahkan install aplikasi bind9 pada *Ardx* dengan perintah:
+Lalu lihat hasil *routing* dengan perintah :
 
-	```
-	apt-get install bind9 -y
-	```
+    route -n
 
-  <img src="https://i.ibb.co/CQBq1mc/2.png" alt="2" border="0">
+Maka sekarang, LAB-PUSAT dan *host* pada LABKOM-1 sudah saling terhubung. Agar semua subnet dapat saling terhubung, tambahkan *static routing* berikut :
 
-### 1.2.B Pembuatan Domain
-Pada sesilab ini kita akan membuat domain **jarkomittsts.com**.
+1. Pada LAB-PUSAT
+    
+        Network 192.168.1.128 Netmask 255.255.255.128 Next Hop 192.168.1.6
+        Network 192.168.1.0 Netmask 255.255.255.252 Next Hop 192.168.1.6
+        Network 192.168.1.12 Netmask 255.255.255.252 Next Hop 192.168.1.10
+        Network 192.168.1.16 Netmask 255.255.255.240 Next Hop 192.168.1.10
+        Network 192.168.1.32 Netmask 255.255.255.224 Next Hop 192.168.1.10
 
-- Lakukan perintah pada *Ardx*. Isikan seperti berikut:
+2. Pada LABKOM-1
 
-  ```
-   nano /etc/bind/named.conf.local
-  ```
+        Network 192.168.1.128 Netmask 255.255.255.128 Next Hop 192.168.1.2
 
-- Isikan configurasi domain **jarkomitts.com** sesuai dengan syntax berikut:
+3. Pada LABKOM-2
+        
+        Network 0.0.0.0 Netmask 0.0.0.0 Next Hop 192.168.1.1
 
-  ```
-  zone "jarkomitts.com" {
-  	type master;
-  	file "/etc/bind/jarkom/jarkomitts.com";
-  };
-  ```
+4. Pada LABKOM-3
 
-  <img src="https://i.ibb.co/2FZ8Brd/3.png" alt="3" border="0">
+        Network 0.0.0.0 Netmask 0.0.0.0 Next Hop 192.168.1.9
+        Network 192.168.1.16 Netmask 255.255.255.240 Next Hop 192.168.1.14
+        Network 192.168.1.32 Netmask 255.255.255.224 Next Hop 192.168.1.14
 
-- Buat folder **jarkom** di dalam **/etc/bind**
+5. Pada LABKOM-4
 
-  ```
-  mkdir /etc/bind/jarkom
-  ```
-  <img src="https://i.ibb.co/xX0mxJs/4.png" alt="4" border="0">
+        Network 0.0.0.0 Netmask 0.0.0.0 Next Hop 192.168.1.13
 
-- Copykan file **db.local** pada path **/etc/bind** ke dalam folder **jarkom** yang baru saja dibuat dan ubah namanya menjadi **jarkomitts.com**
+**Kesimpulannya**, untuk melakukan *static routing* disesuaikan dengan daftar NID yang ada. Semakin banyak NID dalam suatu topologi, semakin banyak pula rute yang perlu ditambahkan ke router, maka diperlukan teknik pengelompokkan (***Subnetting***) yang tepat untuk menyederhanakan ***Routing***.
+        
+### 4). Testing
 
-  ```shell
-  cp /etc/bind/db.local /etc/bind/jarkom/jarkomitts.com
-  ```
+Untuk mengetesnya dapat dilakukan dengan cara ping dari client ke IP tujuan atau menggunakan tombol dengan ikon surat pada *toolbar*.
+![image](https://user-images.githubusercontent.com/31590281/211187014-c741add7-5b1b-448b-8fb5-c23da01d201f.png)
 
-  <img src="https://i.ibb.co/C1p1Ybj/image.png" alt="image" border="0">
-
-- Kemudian buka file **jarkomitts.com** dan edit seperti gambar berikut dengan IP *Ardx* masing-masing kelompok:
-
-  ```shell
-  nano /etc/bind/jarkom/jarkomitts.com
-  ```
-  <img src="https://i.ibb.co/W5KVd7g/image.png" alt="image" border="0">
-
-- Restart bind9 dengan perintah 
-
-  ```shell
-  service named restart
-  ```
-  <img src="https://i.ibb.co/sH9fQZG/image.png" alt="image" border="0">
-
-### 1.2.C Setting nameserver pada client
-
-Domain yang kita buat tidak akan langsung dikenali oleh client oleh sebab itu kita harus merubah settingan nameserver yang ada pada client kita.
-
-- Pada client *Walx* dan *Monx* arahkan nameserver menuju IP *Ardx* dengan mengedit file _resolv.conf_ dengan mengetikkan perintah 
-
-	```shell
-	nano /etc/resolv.conf
-	```
-
-  <img src="https://i.ibb.co/XDd0X5G/image.png" alt="image" border="0">
-
-- Untuk mencoba koneksi DNS, lakukan ping domain **jarkomitts.com** dengan melakukan  perintah berikut pada client *Walx* dan *Monx*
-
-  ```
-  ping jarkomitts.com
-  ```
-
-  <img src="https://i.ibb.co/fSsdZ7R/image.png" alt="image" border="0">
-
-
-
-### 1.2.D Reverse DNS (Record PTR)
-
-Jika pada pembuatan domain sebelumnya DNS server kita bekerja menerjemahkan string domain **jarkomitts.com** kedalam alamat IP agar dapat dibuka, maka Reverse DNS atau Record PTR digunakan untuk menerjemahkan alamat IP ke alamat domain yang sudah diterjemahkan sebelumnya.
-
-- Edit file **/etc/bind/named.conf.local** pada *Ardx*
-
-  ```shell
-  nano /etc/bind/named.conf.local
-  ```
-
-- Lalu tambahkan konfigurasi berikut ke dalam file **named.conf.local**
-
-  ```shell
-  zone "151.151.10.in-addr.arpa" {
-      type master;
-      file "/etc/bind/jarkom/151.151.10.in-addr.arpa";
-  };
-  ```
-  *Keterangan 151.151.10 adalah 3 byte pertama IP Ardx yang dibalik urutan penulisannya*
-
-  <img src="https://i.ibb.co/qjR2WYV/image.png" alt="image" border="0">
-
-
-- Copykan file **db.local** pada path **/etc/bind** ke dalam folder **jarkom** yang baru saja dibuat dan ubah namanya menjadi **83.151.10.in-addr.arpa**
-
-  ```
-  cp /etc/bind/db.local /etc/bind/jarkom/151.151.10.in-addr.arpa
-  ```
-
-  <img src="https://i.ibb.co/CwD28sF/image.png" alt="image" border="0">
-
-- Edit file **151.151.10.in-addr.arpa** menjadi seperti gambar di bawah ini
-
-  <img src="https://i.ibb.co/RgVZDWp/image.png" alt="image" border="0">
-
-- Kemudian restart bind9 dengan perintah 
-
-  ```
-  service named restart
-  ```
-
-- Untuk mengecek apakah konfigurasi sudah benar atau belum, lakukan perintah berikut pada client *Monx* 
-
-  ```
-  // Install package dnsutils
-  // Pastikan nameserver telah dikembalikan ke settingan awal
-  apt-get update
-  apt-get install dnsutils
-  //jika gagal silahkan run perintah 
-  apt-get install dnsutils --fix-missing
-  
-  //Kembalikan nameserver agar tersambung dengan Ardx
-  host -t PTR "IP Ardx"
-  ```
-
-  <img src="https://i.ibb.co/7WgpwdZ/image.png" alt="image" border="0">
-
-
-
-### 1.2.E Record CNAME
-Record CNAME adalah sebuah record yang membuat alias name dan mengarahkan domain ke alamat/domain yang lain.
-
-Langkah-langkah membuat record CNAME:
-
-- Buka file **jarkomitts.com** pada server *Ardx* dan tambahkan konfigurasi seperti pada gambar berikut:
-
-  <img src="https://i.ibb.co/7jqwqsY/image.png" alt="image" border="0">
-
-- Kemudian restart bind9 dengan perintah
-
-  ```shell
-  service named restart
-  ```
-
-- Lalu cek di Walx dengan melakukan **host -t CNAME www.jarkomitts.com** atau **ping www.jarkomitts.com**. Hasilnya harus mengarah ke host dengan IP *Ardx*.
-
-  <img src="https://i.ibb.co/bb1CPMp/image.png" alt="image" border="0">
-
-
-### 1.2.G Membuat Subdomain
-
-Subdomain adalah bagian dari sebuah nama domain induk. Subdomain umumnya mengacu ke suatu alamat fisik di sebuah situs contohnya: **jarkomitts.com** merupakan sebuah domain induk. Sedangkan **halo.jarkomitts.com** merupakan sebuah subdomain.
-
-- Edit file **/etc/bind/jarkom/jarkomitts.com** lalu tambahkan subdomain untuk **jarkomitts.com** yang mengarah ke IP *Ardx*.
-
-  ```
-  nano /etc/bind/jarkom/jarkomitts.com
-  ```
-
-- Tambahkan konfigurasi seperti pada gambar ke dalam file **jarkomitts.com**.
-
-  <img src="https://i.ibb.co/bKygXdf/image.png" alt="image" border="0">
-
-- Restart service bind  
-
-  ```
-  service named restart
-  ```
-
-- Coba ping ke subdomain dengan perintah berikut dari client *Walx*
-
-  ```
-  ping halo.jarkomitts.com
-  
-  ATAU
-  
-  host -t A halo.jarkomitts.com
-  ```
-
-  <img src="https://i.ibb.co/Qks7mm6/image.png" alt="image" border="0">
-
-
-### 1.3 Keterangan Configurasi Zone file
-
-1. #### Penulisan Serial
-
-   Ditulis dengan format YYYYMMDDXX. Serial di increment setiap melakukan perubahan pada file zone.
-
-   ```
-   YYYY adalah tahun
-   MM adalah bulan
-   DD adalah tanggal
-   XX adalah counter
-   ```
-
-   Contoh:
-
-   <img src="https://i.ibb.co/Zdhz8q0/image.png" alt="image" border="0">
-
-2. #### Penggunaan Titik
-
-   <img src="https://i.ibb.co/xfw3Fcc/image.png" alt="image" border="0">
-
-   Pada salah satu contoh di atas, dapat kita amati pada kolom keempat terdapat record yang menggunakan titik pada akhir kata dan ada yang tidak. Penggunaan titik berfungsi sebagai penentu FQDN (Fully-Qualified Domain Name) suatu domain.
-
-   Contohnya jika "**jarkomitts.com.**" di akhiri dengan titik maka akan dianggap sebagai FQDN dan akan dibaca sebagai "**jarkomitts.com**" , sedangkan ns1 di atas tidak menggunakan titik sehingga dia tidak terbaca sebagai FQDN. Maka ns1 akan di tambahkan di depan terhadap nilai $ORIGIN sehinga ns1 akan terbaca sebagai "**ns1.jarkomitts.com**" . Nilai $ORIGIN diambil dari penamaan zone yang terdapat pada  */etc/bind/named.conf.local*.
-
-3. #### Penulisan Name Server (NS) record
-
-   Salah satu aturan penulisan NS record adalah dia harus menuju A record., bukan CNAME. 
-
-
+Untuk hasilnya dapat dilihat pada tab hasil sebelah ujung kanan bawah
+![image](https://user-images.githubusercontent.com/31590281/211187061-2874c476-ef81-4a65-8416-d4695b0dd7de.png)
 
 ## Latihan
 
-1. Buatlah domain **halogaes.id** dan **www.halogaes.id** (CNAME **halogaes.id**). Apa yang terjadi jika melakukan ping **halogaes.id** dengan ping **www.halogaes.id**? Mengapa hal itu terjadi?
-2. Buatlah sebuah subdomain pada domain **halogaes.id** dengan nama **annyeong.halogaes.id**!
+![image](https://user-images.githubusercontent.com/31590281/211187699-9d0c3af3-907a-4655-bd01-ec78895e7a8c.png)
 
-## References
-* https://computer.howstuffworks.com/dns.htm
-* http://knowledgelayer.softlayer.com/faq/what-does-serial-refresh-retry-expire-minimum-and-ttl-mean
-* https://en.wikipedia.org/wiki/List_of_DNS_record_types
-* https://kb.indowebsite.id/knowledge-base/pengertian-catatan-dns-atau-record-dns/
+Implementasikan subnetting dan routing pada topologi di atas untuk IP dan subnet sesuai imajinasi/keinginan anda.
+
+#SELAMAT MENCOBA !!
